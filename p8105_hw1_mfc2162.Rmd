@@ -1,0 +1,137 @@
+---
+title: "p8105_hw1_mfc2162"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+## Problem 1
+
+#### Create dataframe
+
+```{r}
+df1 = tibble(
+  norm_samp = rnorm(8),
+  vec_logical = norm_samp > 0,
+  vec_char = c("There's", "always", "money", "in", "the", "banana", "stand",
+               "!"),
+  vec_factor = factor(c("medium", "low", "high", "medium", "low", "low",
+                        "medium", "medium"))
+)
+
+df1
+```
+
+
+#### Take the mean of each variable
+
+```{r}
+mean_samp = mean(pull(df1, norm_samp))
+mean_logical = mean(pull(df1, vec_logical))
+mean_char = mean(pull(df1, vec_char))
+mean_factor = mean(pull(df1, vec_factor))
+
+mean_samp
+mean_logical
+mean_char
+mean_factor
+```
+
+Taking the mean of the random sample variable and the logical variable worked.
+Taking the mean of the character variable and the factor variable did not work.
+
+#### Apply as.numeric to variables
+
+```{r}
+logical_num = as.numeric(pull(df1, vec_logical))
+char_num = as.numeric(pull(df1, vec_char))
+factor_num = as.numeric(pull(df1, vec_factor))
+```
+
+It works for the logical and factor variables, but not for the character
+variable. Applying as.numeric to the logical variable just changes the TRUE's to
+1's and the FALSE's to 0's. Applying as.numeric to the factor variable assigns a
+number to each level. In this case, it assigned 3 to "medium", 2 to "low", and 1
+to "high". Applying as.numeric to a character vector only works if the characters
+are numbers, such as c("3", "6", "8", "3", "7"). In this case, the characters
+were not numbers, so it didn't work.
+
+
+#### Conversion and multiplication
+
+```{r}
+logical_num = as.numeric(pull(df1, vec_logical))
+product_num = logical_num * pull(df1, norm_samp)
+product_num
+
+logical_fac = as.factor(pull(df1, vec_logical))
+product_fac = logical_fac * pull(df1, norm_samp)
+product_fac
+
+logical_fac_to_num = as.numeric(logical_fac)
+product_fac_to_num = logical_fac_to_num * pull(df1, norm_samp)
+product_fac_to_num
+```
+
+## Problem 2
+
+#### Create data frame
+
+```{r}
+df2 = tibble(
+  x = rnorm(500),
+  y = rnorm(500),
+  log_vec = x + y > 1,
+  num_vec = as.numeric(log_vec),
+  fac_vec = as.factor(log_vec)
+)
+
+df2
+```
+
+#### Data description
+
+The number of rows in the dataset is `r nrow(df2)` and the number of columns is
+`r ncol(df2)`.
+
+The mean of x is `r mean(pull(df2, x))`.
+The median of x is `r median(pull(df2, x))`.
+The standard deviation of x is `r sd(pull(df2, x))`.
+
+The proportion of cases for which x + y > 1 is `r sum(pull(df2, log_vec))/500`.
+
+#### Scatterplots
+
+
+Color by logical variable
+```{r}
+scatter1 = ggplot(df2, aes(x = x, y = y, color=log_vec)) + geom_point()
+scatter1
+```
+
+
+Color by numeric variable
+```{r}
+ggplot(df2, aes(x = x, y = y, color=num_vec)) + geom_point()
+```
+
+The color scale is continuous because numeric variables are continuous. However,
+all of the points are either light blue or dark blue because they are all 1 or
+0.
+
+
+Color by factor variable
+```{r}
+ggplot(df2, aes(x = x, y = y, color=fac_vec)) + geom_point()
+```
+
+The color scale is discrete because factor variables are made up of discrete
+levels. Points are red if FALSE and blue if TRUE.
+
+#### Export first scatterplot
+
+```{r}
+ggsave("HW1_scatterplot.pdf", plot = scatter1, height = 4, width = 6)
+```
